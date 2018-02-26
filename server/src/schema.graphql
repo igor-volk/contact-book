@@ -1,17 +1,13 @@
 # import PhoneNumber, Contact from "./generated/prisma.graphql"
 
 type Query {
-  feed(filter: String, skip: Int, first: Int): Feed!
-}
-
-type Feed {
-  contacts: [Contact!]!
-  count: Int!
+  feed(filter: String, skip: Int, first: Int): [Contact!]!
 }
 
 type Mutation {
-  deleteContact(userId: String!): int!
-  addPhoneNumber(userId: String!, number: String!, label: String!): int!
-  deletePhoneNumber(id: String!): int!
-  updatePhoneNumber(id: String!, number: String!): int!
+  addContact(firstName: String!, lastName: String!, phoneNumbers: [String!]) : Contact
+  deleteContact(contact: Contact!): Contact
+  addPhoneNumber(contact: Contact!, phoneNumber: String!, label: String!): PhoneNumber
+  deletePhoneNumber(id: String!): PhoneNumber
+  updatePhoneNumber(id: String!, phoneNumber: String!, label: String!): PhoneNumber
 }

@@ -7,15 +7,16 @@
 
 type Contact implements Node {
   id: ID!
-  name: String!
-  surname: String!
+  firstName: String!
+  lastName: String!
   phoneNumbers(where: PhoneNumberWhereInput, orderBy: PhoneNumberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [PhoneNumber!]
 }
 
 type PhoneNumber implements Node {
   id: ID!
-  number: String!
+  phoneNumber: String!
   label: String!
+  contact(where: ContactWhereInput): Contact!
 }
 
 
@@ -42,9 +43,19 @@ type ContactConnection {
 }
 
 input ContactCreateInput {
-  name: String!
-  surname: String!
-  phoneNumbers: PhoneNumberCreateManyInput
+  firstName: String!
+  lastName: String!
+  phoneNumbers: PhoneNumberCreateManyWithoutContactInput
+}
+
+input ContactCreateOneWithoutPhoneNumbersInput {
+  create: ContactCreateWithoutPhoneNumbersInput
+  connect: ContactWhereUniqueInput
+}
+
+input ContactCreateWithoutPhoneNumbersInput {
+  firstName: String!
+  lastName: String!
 }
 
 type ContactEdge {
@@ -55,10 +66,10 @@ type ContactEdge {
 enum ContactOrderByInput {
   id_ASC
   id_DESC
-  name_ASC
-  name_DESC
-  surname_ASC
-  surname_DESC
+  firstName_ASC
+  firstName_DESC
+  lastName_ASC
+  lastName_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -67,8 +78,8 @@ enum ContactOrderByInput {
 
 type ContactPreviousValues {
   id: ID!
-  name: String!
-  surname: String!
+  firstName: String!
+  lastName: String!
 }
 
 type ContactSubscriptionPayload {
@@ -89,9 +100,34 @@ input ContactSubscriptionWhereInput {
 }
 
 input ContactUpdateInput {
-  name: String
-  surname: String
-  phoneNumbers: PhoneNumberUpdateManyInput
+  firstName: String
+  lastName: String
+  phoneNumbers: PhoneNumberUpdateManyWithoutContactInput
+}
+
+input ContactUpdateOneWithoutPhoneNumbersInput {
+  create: ContactCreateWithoutPhoneNumbersInput
+  connect: ContactWhereUniqueInput
+  disconnect: ContactWhereUniqueInput
+  delete: ContactWhereUniqueInput
+  update: ContactUpdateWithoutPhoneNumbersInput
+  upsert: ContactUpsertWithoutPhoneNumbersInput
+}
+
+input ContactUpdateWithoutPhoneNumbersDataInput {
+  firstName: String
+  lastName: String
+}
+
+input ContactUpdateWithoutPhoneNumbersInput {
+  where: ContactWhereUniqueInput!
+  data: ContactUpdateWithoutPhoneNumbersDataInput!
+}
+
+input ContactUpsertWithoutPhoneNumbersInput {
+  where: ContactWhereUniqueInput!
+  update: ContactUpdateWithoutPhoneNumbersDataInput!
+  create: ContactCreateWithoutPhoneNumbersInput!
 }
 
 input ContactWhereInput {
@@ -111,34 +147,34 @@ input ContactWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  name: String
-  name_not: String
-  name_in: [String!]
-  name_not_in: [String!]
-  name_lt: String
-  name_lte: String
-  name_gt: String
-  name_gte: String
-  name_contains: String
-  name_not_contains: String
-  name_starts_with: String
-  name_not_starts_with: String
-  name_ends_with: String
-  name_not_ends_with: String
-  surname: String
-  surname_not: String
-  surname_in: [String!]
-  surname_not_in: [String!]
-  surname_lt: String
-  surname_lte: String
-  surname_gt: String
-  surname_gte: String
-  surname_contains: String
-  surname_not_contains: String
-  surname_starts_with: String
-  surname_not_starts_with: String
-  surname_ends_with: String
-  surname_not_ends_with: String
+  firstName: String
+  firstName_not: String
+  firstName_in: [String!]
+  firstName_not_in: [String!]
+  firstName_lt: String
+  firstName_lte: String
+  firstName_gt: String
+  firstName_gte: String
+  firstName_contains: String
+  firstName_not_contains: String
+  firstName_starts_with: String
+  firstName_not_starts_with: String
+  firstName_ends_with: String
+  firstName_not_ends_with: String
+  lastName: String
+  lastName_not: String
+  lastName_in: [String!]
+  lastName_not_in: [String!]
+  lastName_lt: String
+  lastName_lte: String
+  lastName_gt: String
+  lastName_gte: String
+  lastName_contains: String
+  lastName_not_contains: String
+  lastName_starts_with: String
+  lastName_not_starts_with: String
+  lastName_ends_with: String
+  lastName_not_ends_with: String
   phoneNumbers_every: PhoneNumberWhereInput
   phoneNumbers_some: PhoneNumberWhereInput
   phoneNumbers_none: PhoneNumberWhereInput
@@ -189,13 +225,19 @@ type PhoneNumberConnection {
 }
 
 input PhoneNumberCreateInput {
-  number: String!
+  phoneNumber: String!
   label: String!
+  contact: ContactCreateOneWithoutPhoneNumbersInput!
 }
 
-input PhoneNumberCreateManyInput {
-  create: [PhoneNumberCreateInput!]
+input PhoneNumberCreateManyWithoutContactInput {
+  create: [PhoneNumberCreateWithoutContactInput!]
   connect: [PhoneNumberWhereUniqueInput!]
+}
+
+input PhoneNumberCreateWithoutContactInput {
+  phoneNumber: String!
+  label: String!
 }
 
 type PhoneNumberEdge {
@@ -206,8 +248,8 @@ type PhoneNumberEdge {
 enum PhoneNumberOrderByInput {
   id_ASC
   id_DESC
-  number_ASC
-  number_DESC
+  phoneNumber_ASC
+  phoneNumber_DESC
   label_ASC
   label_DESC
   updatedAt_ASC
@@ -218,7 +260,7 @@ enum PhoneNumberOrderByInput {
 
 type PhoneNumberPreviousValues {
   id: ID!
-  number: String!
+  phoneNumber: String!
   label: String!
 }
 
@@ -239,34 +281,35 @@ input PhoneNumberSubscriptionWhereInput {
   node: PhoneNumberWhereInput
 }
 
-input PhoneNumberUpdateDataInput {
-  number: String
-  label: String
-}
-
 input PhoneNumberUpdateInput {
-  number: String
+  phoneNumber: String
   label: String
+  contact: ContactUpdateOneWithoutPhoneNumbersInput
 }
 
-input PhoneNumberUpdateManyInput {
-  create: [PhoneNumberCreateInput!]
+input PhoneNumberUpdateManyWithoutContactInput {
+  create: [PhoneNumberCreateWithoutContactInput!]
   connect: [PhoneNumberWhereUniqueInput!]
   disconnect: [PhoneNumberWhereUniqueInput!]
   delete: [PhoneNumberWhereUniqueInput!]
-  update: [PhoneNumberUpdateNestedInput!]
-  upsert: [PhoneNumberUpsertNestedInput!]
+  update: [PhoneNumberUpdateWithoutContactInput!]
+  upsert: [PhoneNumberUpsertWithoutContactInput!]
 }
 
-input PhoneNumberUpdateNestedInput {
-  where: PhoneNumberWhereUniqueInput!
-  data: PhoneNumberUpdateDataInput!
+input PhoneNumberUpdateWithoutContactDataInput {
+  phoneNumber: String
+  label: String
 }
 
-input PhoneNumberUpsertNestedInput {
+input PhoneNumberUpdateWithoutContactInput {
   where: PhoneNumberWhereUniqueInput!
-  update: PhoneNumberUpdateDataInput!
-  create: PhoneNumberCreateInput!
+  data: PhoneNumberUpdateWithoutContactDataInput!
+}
+
+input PhoneNumberUpsertWithoutContactInput {
+  where: PhoneNumberWhereUniqueInput!
+  update: PhoneNumberUpdateWithoutContactDataInput!
+  create: PhoneNumberCreateWithoutContactInput!
 }
 
 input PhoneNumberWhereInput {
@@ -286,20 +329,20 @@ input PhoneNumberWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  number: String
-  number_not: String
-  number_in: [String!]
-  number_not_in: [String!]
-  number_lt: String
-  number_lte: String
-  number_gt: String
-  number_gte: String
-  number_contains: String
-  number_not_contains: String
-  number_starts_with: String
-  number_not_starts_with: String
-  number_ends_with: String
-  number_not_ends_with: String
+  phoneNumber: String
+  phoneNumber_not: String
+  phoneNumber_in: [String!]
+  phoneNumber_not_in: [String!]
+  phoneNumber_lt: String
+  phoneNumber_lte: String
+  phoneNumber_gt: String
+  phoneNumber_gte: String
+  phoneNumber_contains: String
+  phoneNumber_not_contains: String
+  phoneNumber_starts_with: String
+  phoneNumber_not_starts_with: String
+  phoneNumber_ends_with: String
+  phoneNumber_not_ends_with: String
   label: String
   label_not: String
   label_in: [String!]
@@ -314,6 +357,7 @@ input PhoneNumberWhereInput {
   label_not_starts_with: String
   label_ends_with: String
   label_not_ends_with: String
+  contact: ContactWhereInput
 }
 
 input PhoneNumberWhereUniqueInput {

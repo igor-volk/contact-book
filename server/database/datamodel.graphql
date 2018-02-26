@@ -1,12 +1,13 @@
 type PhoneNumber {
   id: ID! @unique
-  number: String!
+  phoneNumber: String!
   label: String!
+  contact: Contact!
 }
 
 type Contact {
   id: ID! @unique
-  name: String!
-  surname: String!
+  firstName: String!
+  lastName: String!
   phoneNumbers: [PhoneNumber!]!
 }

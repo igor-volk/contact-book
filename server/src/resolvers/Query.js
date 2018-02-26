@@ -1,13 +1,12 @@
-async function feed(parent, args, ctx, info) {
-  const allContacts = await ctx.db.query.contacts({})
-  const count = allContacts.length
+function feed(parent, args, ctx, info) {
+    const { filter, first, skip } = args // destructure input arguments
+    const where = filter
+        ? { OR: [{ url_contains: filter }, { description_contains: filter }] }
+        : {}
 
-  return {
-    linkIds: allContacts.map(contact => contact.id),
-    count
-  }
+    return context.db.query.contacts({ first, skip, where }, info)
 }
 
 module.exports = {
-  feed,
+  feed
 }
