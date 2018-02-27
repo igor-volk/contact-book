@@ -11,6 +11,8 @@
 
 # IDE
 .idea/
+.idea/hackernews-react-apollo.iml
+.idea/workspace.xml
 
 # misc
 .DS_Store

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import CreateLink from './CreateLink'
-import LinkList from './LinkList'
+import ContactList from './ContactList'
 import Header from './Header'
 import { Switch, Route } from 'react-router-dom'
 
@@ -9,9 +9,9 @@ class App extends Component {
         return (
             <div className="center w85">
                 <Header />
-                <div className="ph3 pv1 background-gray">
+                <div className="ph3 pv1">
                     <Switch>
-                        <Route exact path="/" component={LinkList} />
+                        <Route exact path="/" component={ContactList} />
                         <Route exact path="/create" component={CreateLink} />
                     </Switch>
                 </div>

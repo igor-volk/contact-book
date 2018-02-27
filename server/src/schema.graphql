@@ -5,9 +5,6 @@ type Query {
 }
 
 type Mutation {
-  addContact(firstName: String!, lastName: String!, phoneNumbers: [String!]) : Contact
-  deleteContact(contact: Contact!): Contact
-  addPhoneNumber(contact: Contact!, phoneNumber: String!, label: String!): PhoneNumber
-  deletePhoneNumber(id: String!): PhoneNumber
-  updatePhoneNumber(id: String!, phoneNumber: String!, label: String!): PhoneNumber
+  post(firstName: String!, lastName: String!, phoneNumbers: [String!]): Contact!
+  removeContact(id: ID!): Contact
 }

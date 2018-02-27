@@ -20,6 +20,28 @@ input {
   background-color: rgb(246,246,239);
 }
 
+.background-gray-focus {
+  background-color: rgb(232, 232, 225);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5px
+}
+
+.delete-button {
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.delete-button-focus {
+  cursor: pointer;
+  font-weight: bold;
+}
+
 .f11 {
   font-size: 11px;
 }

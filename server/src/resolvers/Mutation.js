@@ -1,11 +1,19 @@
 const { APP_SECRET, getUserId } = require('../utils')
 
-async function addContact(parent, { firstName, lastName, phoneNumbers }, ctx, info) {
-  return ctx.db.mutation.addContact({
+function post(parent, { firstName, lastName, phoneNumbers }, ctx, info) {
+  return ctx.db.mutation.createContact({
     data: {
       firstName,
       lastName,
       phoneNumbers
+    }}, info
+  )
+}
+
+function removeContact(parent, { id }, ctx, info) {
+  return ctx.db.mutation.deleteContact({
+    where: {
+      id
     }}, info
   )
 }
@@ -20,7 +28,7 @@ async function addPhoneNumber(parent, { contact, phoneNumber, label }, ctx, info
       throw new Error(`Phone number already aded: ${phoneNumber}`)
   }
 
-  const phoneNumber = await ctx.db.mutation.addPhoneNumber({ data: { contact, phoneNumber, label } }, info);
+  const phoneNumber = await ctx.db.mutation.createPhoneNumber({ data: { contact, phoneNumber, label } }, info);
 
   return phoneNumber;
 }
@@ -38,8 +46,6 @@ async function updatePhoneNumber(parent, { id, phoneNumber, label }, ctx, info) 
 }
 
 module.exports = {
-  addContact,
-  addPhoneNumber,
-  deletePhoneNumber,
-  updatePhoneNumber
+  post,
+  removeContact
 }
