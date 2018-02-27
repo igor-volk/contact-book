@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import flow from 'lodash.flow'
 
 class Contact extends Component {
     constructor (props) {
@@ -14,6 +16,7 @@ class Contact extends Component {
         this.onHoverDelete = this.onHoverDelete.bind(this);
         this.onHoverDeleteOff = this.onHoverDeleteOff.bind(this);
         this.deleteContact = this.deleteContact.bind(this);
+        this.editContact = this.editContact.bind(this);
     }
 
     onHoverRow() {
@@ -41,21 +44,29 @@ class Contact extends Component {
         })
     }
 
+    editContact() {
+        this.props.history.push(`/edit/${this.props.contact.id}`)
+    }
+
     render() {
         return (
             <div
-                className={ this.state.hover ? "row background-gray-focus" : "row background-gray"}
+                className={this.state.hover ? "row background-gray-focus" : "row background-gray"}
                 onMouseEnter={this.onHoverRow}
                 onMouseLeave={this.onHoverRowOff}
+                onClick={this.editContact}
                 >
-                <div>
-                {this.props.contact.firstName} {this.props.contact.lastName}
+                <div className="ml1 no-underline black">
+                    {this.props.contact.firstName} {this.props.contact.lastName}
                 </div>
                 <div
                     className={ this.state.delete ? "delete-button-focus" : "delete-button"}
                     onMouseEnter={this.onHoverDelete}
                     onMouseLeave={this.onHoverDeleteOff}
-                    onClick={() => this.deleteContact()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.deleteContact();
+                    }}
                     >X</div>
             </div>
         )
@@ -65,10 +76,13 @@ class Contact extends Component {
 const DELETE_MUTATION = gql`
   mutation DeleteMutation($contactId: ID!) {
     removeContact(id: $contactId) {
-      firstName,
+      firstName
       lastName
     }
   }
 `
 
-export default graphql(DELETE_MUTATION, { name: "deleteMutation" })(Contact);
+export default flow(
+    withRouter,
+    graphql(DELETE_MUTATION, { name: "deleteMutation" }))
+(Contact);

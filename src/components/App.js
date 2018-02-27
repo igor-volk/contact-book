@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import CreateLink from './CreateLink'
+import CreateContact from './CreateContact'
 import ContactList from './ContactList'
+import EditContact from './EditContact'
 import Header from './Header'
 import { Switch, Route } from 'react-router-dom'
 
@@ -12,7 +13,8 @@ class App extends Component {
                 <div className="ph3 pv1">
                     <Switch>
                         <Route exact path="/" component={ContactList} />
-                        <Route exact path="/create" component={CreateLink} />
+                        <Route exact path="/create" component={CreateContact} />
+                        <Route exact path="/edit/:id" component={EditContact} />
                     </Switch>
                 </div>
             </div>

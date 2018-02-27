@@ -21,8 +21,7 @@ class ContactList extends Component {
     }
 }
 
-const FEED_QUERY = gql`
-  # 2
+export const FEED_QUERY = gql`
   query FeedQuery {
     feed {
       id
@@ -32,5 +31,4 @@ const FEED_QUERY = gql`
   }
 `
 
-// 3
 export default graphql(FEED_QUERY, { name: 'feedQuery' }) (ContactList)

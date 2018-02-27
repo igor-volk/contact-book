@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom'
 import './styles/index.css';
 import App from './components/App';
+import configureStore from './configureStore';
 import registerServiceWorker from './registerServiceWorker';
 
 import { ApolloProvider } from 'react-apollo'
@@ -16,6 +17,8 @@ const client = new ApolloClient({
     link: httpLink,
     cache: new InMemoryCache()
 });
+
+// const store = {}; //configureStore(client);
 
 ReactDOM.render(
     <BrowserRouter>
