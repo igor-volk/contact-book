@@ -54,7 +54,6 @@ class CreateContact extends Component {
 }
 
 const POST_MUTATION = gql`
-  # 2
   mutation PostMutation($firstName: String!, $lastName: String!) {
     post(firstName: $firstName, lastName: $lastName) {
       id,

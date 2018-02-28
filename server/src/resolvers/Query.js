@@ -7,7 +7,7 @@ function feed(parent, args, ctx, info) {
     return ctx.db.query.contacts({ first, skip, where }, info)
 }
 
-function getContact(parent, { id }, ctx, info) {
+function contact(parent, { id }, ctx, info) {
     return ctx.db.query.contact({
         where: {
             id
@@ -17,5 +17,5 @@ function getContact(parent, { id }, ctx, info) {
 
 module.exports = {
     feed,
-    getContact
+    contact
 }

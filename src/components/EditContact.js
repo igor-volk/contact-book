@@ -12,21 +12,16 @@ class EditContact extends Component {
 		this.getContact = this.getContact.bind(this);
 	}
 
-	componentDidMount () {
-		this.getContact();
-	}
-
 	componentWillReceiveProps(nextProps) {
 		console.log('--->', nextProps)
 		this.setState({
-			firstName: nextProps.contactQuery.firstName,
-			lastName: nextProps.contactQuery.lastName
+			firstName: nextProps.contactQuery.contact.firstName,
+			lastName: nextProps.contactQuery.contact.lastName
 		})
 	}
 
 	getContact = async () => {
 		const contactId = this.props.match.params.id
-		console.log('Contact ID :: ', contactId)
 		await this.props.contactQuery({
 			variables: {
 				contactId
@@ -39,14 +34,14 @@ class EditContact extends Component {
 			<div className="column">
 				<input
 					className="mb2"
-					value={this.props.contactQuery.firstName}
+					value={this.state.firstName}
 					onChange={e => this.setState({ firstName: e.target.value })}
 					type="text"
 					placeholder="First name"
 				/>
 				<input
 					className="mb2"
-					value={this.props.contactQuery.lastName}
+					value={this.state.lastName}
 					onChange={e => this.setState({ lastName: e.target.value })}
 					type="text"
 					placeholder="Last name"
@@ -58,11 +53,19 @@ class EditContact extends Component {
 
 const CONTACT_QUERY = gql`
   query ContactQuery($contactId: ID!) {
-    getContact(id: $contactId) {
+    contact(id: $contactId) {
       firstName
       lastName
     }
   }
 `
 
-export default graphql(CONTACT_QUERY, { name: 'contactQuery' }) (EditContact)
+export default graphql(CONTACT_QUERY, {
+	name: 'contactQuery',
+	options: ownProps => {
+		const contactId = ownProps.match.params.id;
+		return {
+			variables: { contactId }
+		}
+	}
+}) (EditContact)
