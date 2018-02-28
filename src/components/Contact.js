@@ -4,6 +4,8 @@ import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import flow from 'lodash.flow'
 
+import { FEED_QUERY } from './ContactList'
+
 class Contact extends Component {
     constructor (props) {
         super(props);
@@ -40,6 +42,15 @@ class Contact extends Component {
         await this.props.deleteMutation({
             variables: {
                 contactId
+            },
+            update: (store, { data: { removeContact } }) => {
+                const data = store.readQuery({ query: FEED_QUERY })
+                const newData = Object.assign({}, data);
+                newData.feed = data.feed.filter(e => e.id !== removeContact.id)
+                store.writeQuery({
+                    query: FEED_QUERY,
+                    newData
+                })
             }
         })
     }
@@ -76,6 +87,7 @@ class Contact extends Component {
 const DELETE_MUTATION = gql`
   mutation DeleteMutation($contactId: ID!) {
     removeContact(id: $contactId) {
+      id
       firstName
       lastName
     }

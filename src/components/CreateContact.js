@@ -42,7 +42,7 @@ class CreateContact extends Component {
             },
             update: (store, { data: { post } }) => {
                 const data = store.readQuery({ query: FEED_QUERY })
-                data.feed.splice(0, 0, post)
+                data.feed.push(post)
                 store.writeQuery({
                     query: FEED_QUERY,
                     data
