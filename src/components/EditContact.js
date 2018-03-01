@@ -2,14 +2,24 @@ import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
+import PhoneNumber from './PhoneNumber'
+
 class EditContact extends Component {
 	constructor (props) {
 		super(props);
 		this.state = {
 			firstName: '',
-			lastName: ''
+			lastName: '',
+			phoneNumbers: []
 		}
 		this.getContact = this.getContact.bind(this);
+		this.addPhoneNumber = this.addPhoneNumber.bind(this);
+		this.saveContact = this.saveContact.bind(this);
+		this.onNumberChange = this.onNumberChange.bind(this);
+		this.onLabelChange = this.onLabelChange.bind(this);
+		this.onPhoneNumberDelete = this.onPhoneNumberDelete.bind(this);
+		this.renderPhoneNumber = this.renderPhoneNumber.bind(this);
+		
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -17,7 +27,46 @@ class EditContact extends Component {
 		this.setState({
 			firstName: nextProps.contactQuery.contact.firstName,
 			lastName: nextProps.contactQuery.contact.lastName
-		})
+		});
+	}
+
+	addPhoneNumber() {
+		const phoneNumbers = this.state.phoneNumbers;
+		phoneNumbers.push({
+			phoneNumber: '',
+			label: ''
+		});
+		this.setState({
+			phoneNumbers: phoneNumbers
+		});
+	}
+
+	saveContact () {
+
+	}
+
+	onNumberChange (value, index) {
+		const phoneNumbers = this.state.phoneNumbers;
+		phoneNumbers[index].phoneNumber = value;
+		this.setState({
+			phoneNumbers: phoneNumbers
+		});
+	}
+
+	onLabelChange (value, index) {
+		const phoneNumbers = this.state.phoneNumbers;
+		phoneNumbers[index].label = value;
+		this.setState({
+			phoneNumbers: phoneNumbers
+		});
+	}
+
+	onPhoneNumberDelete (index) {
+		const phoneNumbers = this.state.phoneNumbers;
+		phoneNumbers.splice(index, 1);
+		this.setState({
+			phoneNumbers: phoneNumbers
+		});
 	}
 
 	getContact = async () => {
@@ -26,10 +75,30 @@ class EditContact extends Component {
 			variables: {
 				contactId
 			}
-		})
+		});
 	}
 	
-	render() {
+	renderPhoneNumber (phoneNumber, i) {
+		return (
+			<PhoneNumber 
+				key={i} 
+				index= {i} 
+				data={phoneNumber} 
+				onNumberChange={this.onNumberChange} 
+				onLabelChange={this.onLabelChange} 
+				onDelete={this.onPhoneNumberDelete}
+			/>
+		)
+	}
+	
+	render () {
+		if (this.props.contactQuery && this.props.contactQuery.loading) {
+			return <div>Loading</div>
+		}
+
+		if (this.props.contactQuery && this.props.contactQuery.error) {
+			return <div>Error</div>
+		}
 		return (
 			<div className="column">
 				<input
@@ -46,6 +115,9 @@ class EditContact extends Component {
 					type="text"
 					placeholder="Last name"
 				/>
+				<button onClick={() => this.addPhoneNumber()}>Add phone number</button>
+				<div>{this.state.phoneNumbers.map(this.renderPhoneNumber)}</div>
+				<button onClick={() => this.saveContact()}>Save Contact</button>
 			</div>
 		)
 	}

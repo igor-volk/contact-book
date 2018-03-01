@@ -45,11 +45,11 @@ class Contact extends Component {
             },
             update: (store, { data: { removeContact } }) => {
                 const data = store.readQuery({ query: FEED_QUERY })
-                const newData = Object.assign({}, data);
-                newData.feed = data.feed.filter(e => e.id !== removeContact.id)
+                const newContacts = data.feed.filter(e => e.id !== removeContact.id)
+                data.feed = newContacts
                 store.writeQuery({
                     query: FEED_QUERY,
-                    newData
+                    data
                 })
             }
         })
