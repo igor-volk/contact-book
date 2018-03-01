@@ -11,11 +11,24 @@ function post(parent, { firstName, lastName, phoneNumbers }, ctx, info) {
 }
 
 function removeContact(parent, { id }, ctx, info) {
-  return ctx.db.mutation.deleteContact({
-    where: {
-      id
-    }}, info
-  )
+    return ctx.db.mutation.deleteContact({
+        where: {
+            id
+        }}, info
+    )
+}
+
+function updateContact(parent, { id, firstName, lastName, phoneNumbers }, ctx, info) {
+    return ctx.db.mutation.updateContact({
+        where: {
+            id
+        },
+        data: {
+            firstName,
+            lastName,
+            phoneNumbers
+        }}, info
+    )
 }
 
 async function addPhoneNumber(parent, { contact, phoneNumber, label }, ctx, info) {

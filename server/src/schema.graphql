@@ -8,4 +8,5 @@ type Query {
 type Mutation {
   post(firstName: String!, lastName: String!, phoneNumbers: [String!]): Contact!
   removeContact(id: ID!): Contact
+  updateContact(id: ID!, firstName: String, lastName: String, phoneNumbers: [String!]) : Contact
 }

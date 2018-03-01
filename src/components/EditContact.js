@@ -132,6 +132,17 @@ const CONTACT_QUERY = gql`
   }
 `
 
+const UPDATE_CONTACT_MUTATION = gql`
+  query UpdateContactMutation($contactId: ID!, $firstName: String, $lastName: String, $phoneNumbers: [String!]) {
+    updateContact(id: $contactId, firstName: $firstName, lastName: $lastName, phoneNumbers: $phoneNumbers) {
+      id
+      firstName
+      lastName
+      phoneNumbers
+    }
+  }
+`
+
 export default graphql(CONTACT_QUERY, {
 	name: 'contactQuery',
 	options: ownProps => {
@@ -140,4 +151,14 @@ export default graphql(CONTACT_QUERY, {
 			variables: { contactId }
 		}
 	}
-}) (EditContact)
+}) (graphql(UPDATE_CONTACT_MUTATION, {
+	name: 'updateContactMutation',
+    options: ownProps => {
+        const contactId = ownProps.match.params.id;
+        return {
+            variables: {
+            	contactId
+            }
+        }
+    }
+})(EditContact))
