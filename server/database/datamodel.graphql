@@ -2,12 +2,12 @@ type PhoneNumber {
   id: ID! @unique
   phoneNumber: String!
   label: String!
-  contact: Contact!
+  contact: Contact @relation(name: "ContactPhoneNumber")
 }
 
 type Contact {
   id: ID! @unique
   firstName: String!
   lastName: String!
-  phoneNumbers: [PhoneNumber!]!
+  phoneNumbers: [PhoneNumber!]! @relation(name: "ContactPhoneNumber")
 }

@@ -16,7 +16,7 @@ type PhoneNumber implements Node {
   id: ID!
   phoneNumber: String!
   label: String!
-  contact(where: ContactWhereInput): Contact!
+  contact(where: ContactWhereInput): Contact
 }
 
 
@@ -227,7 +227,7 @@ type PhoneNumberConnection {
 input PhoneNumberCreateInput {
   phoneNumber: String!
   label: String!
-  contact: ContactCreateOneWithoutPhoneNumbersInput!
+  contact: ContactCreateOneWithoutPhoneNumbersInput
 }
 
 input PhoneNumberCreateManyWithoutContactInput {
