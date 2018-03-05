@@ -12,4 +12,6 @@ type Mutation {
   updateContact(id: ID!, firstName: String, lastName: String) : Contact
   addPhoneNumber(phoneNumber: String!, label: String!, contactId: ID!) : PhoneNumber!
   removePhoneNumbers(contactId: ID!) : BatchPayload
+  updatePhoneNumber(id: ID!, phoneNumber: String, label: String, contactId: ID) : PhoneNumber!
+  deletePhoneNumber(id: ID!) : PhoneNumber
 }

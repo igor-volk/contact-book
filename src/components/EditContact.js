@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
+import { withRouter } from 'react-router'
 import gql from 'graphql-tag'
 import flow from 'lodash.flow'
+import isEqual from 'lodash.isequal'
 
 import PhoneNumber from './PhoneNumber'
 
@@ -44,23 +46,25 @@ class EditContact extends Component {
 	}
 
 	onNumberChange (value, index) {
-		const phoneNumbers = this.state.phoneNumbers;
-		phoneNumbers[index].phoneNumber = value;
+		const phoneNumbers = [...this.state.phoneNumbers];
+		const newPhoneNumber = Object.assign({}, phoneNumbers[index], { phoneNumber: value });
+		phoneNumbers[index] = newPhoneNumber;
 		this.setState({
 			phoneNumbers: phoneNumbers
 		});
 	}
 
 	onLabelChange (value, index) {
-		const phoneNumbers = this.state.phoneNumbers;
-		phoneNumbers[index].label = value;
+        const phoneNumbers = [...this.state.phoneNumbers];
+        const newPhoneNumber = Object.assign({}, phoneNumbers[index], { label: value });
+        phoneNumbers[index] = newPhoneNumber;
 		this.setState({
 			phoneNumbers: phoneNumbers
 		});
 	}
 
 	onPhoneNumberDelete (index) {
-		const phoneNumbers = this.state.phoneNumbers;
+		const phoneNumbers = [...this.state.phoneNumbers];
 		phoneNumbers.splice(index, 1);
 		this.setState({
 			phoneNumbers: phoneNumbers
@@ -76,6 +80,31 @@ class EditContact extends Component {
 				lastName: this.state.lastName
 			}
 		});
+		this.props.phoneNumbersQuery.phoneNumbers.map(storedPhoneNumber => {
+			// if phone number is not in state -> delete
+			const localPhoneNumber = this.state.phoneNumbers.find(localPhoneNumber => localPhoneNumber.id === storedPhoneNumber.id)
+			if (!localPhoneNumber) {
+				this.props.deletePhoneNumberMutation({
+					variables: {
+						id: storedPhoneNumber.id
+					},
+                    refetchQueries: [{ query: PHONE_NUMBERS_QUERY, variables: { contactId }}]
+				})
+			} else { // if phone number is not the same -> update
+				if (!isEqual(storedPhoneNumber, localPhoneNumber)) {
+                    this.props.updatePhoneNumberMutation({
+						variables: {
+							id: localPhoneNumber.id,
+							phoneNumber: localPhoneNumber.phoneNumber,
+							label: localPhoneNumber.label,
+                            contactId
+						},
+                        refetchQueries: [{ query: PHONE_NUMBERS_QUERY, variables: { contactId }}]
+                    });
+				}
+			}
+		})
+        this.props.history.push('/')
 	}
 	
 	renderPhoneNumber (phoneNumber, i) {
@@ -115,9 +144,9 @@ class EditContact extends Component {
 					type="text"
 					placeholder="Last name"
 				/>
-				<button onClick={() => this.addPhoneNumber()}>Add phone number</button>
+				<button className="mb2" onClick={() => this.addPhoneNumber()}>Add phone number</button>
 				<div>{this.state.phoneNumbers.map(this.renderPhoneNumber)}</div>
-				<button onClick={() => this.saveContact()}>Save Contact</button>
+				<button className="mb2" onClick={() => this.saveContact()}>Save</button>
 			</div>
 		)
 	}
@@ -143,9 +172,31 @@ const UPDATE_CONTACT_MUTATION = gql`
   }
 `
 
-export const PHONE_NUMBERS_QUERY = gql`
+const PHONE_NUMBERS_QUERY = gql`
   query PhoneNumbersQuery($contactId: ID!) {
     phoneNumbers(contactId: $contactId) {
+      id
+      phoneNumber
+      label
+      contactId
+    }
+  }
+`
+
+const UPDATE_PHONE_NUMBER_MUTATION = gql`
+  mutation UpdatePhoneNumberMutation($id: ID!, $firstName: String, $lastName: String, $contactId: ID!) {
+    updatePhoneNumber(id: $id, firstName: $firstName, lastName: $lastName, contactId: $contactId) {
+      id
+      firstName
+      lastName
+      contactId
+    }
+  }
+`
+
+const DELETE_PHONE_NUMBER_MUTATION = gql`
+  mutation DeletePhoneNumberMutation($id: ID!) {
+    deletePhoneNumber(id: $id) {
       id
       phoneNumber
       label
@@ -184,8 +235,19 @@ const updateContactMutation = graphql(UPDATE_CONTACT_MUTATION, {
 	}
 });
 
+const updatePhoneNumberMutation = graphql(UPDATE_PHONE_NUMBER_MUTATION, {
+	name: 'updatePhoneNumberMutation'
+});
+
+const deletePhoneNumberMutation = graphql(DELETE_PHONE_NUMBER_MUTATION, {
+	name: 'deletePhoneNumberMutation'
+});
+
 export default flow(
+    withRouter,
 	contactQuery,
 	phoneNumbersQuery,
-	updateContactMutation
+	updateContactMutation,
+    updatePhoneNumberMutation,
+    deletePhoneNumberMutation
 )(EditContact);

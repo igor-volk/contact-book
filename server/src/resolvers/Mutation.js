@@ -1,5 +1,3 @@
-const { APP_SECRET, getUserId } = require('../utils')
-
 function post(parent, { firstName, lastName }, ctx, info) {
   return ctx.db.mutation.createContact({
     data: {
@@ -37,6 +35,23 @@ function removePhoneNumbers (parent, { contactId  }, ctx, info) {
     })
 }
 
+function updatePhoneNumber(parent, { id, phoneNumber, label, contactId }, ctx, info) {
+    return ctx.db.mutation.updatePhoneNumber({
+        where: {
+            id
+        },
+        data: {
+            phoneNumber,
+            label,
+            contactId
+        }
+    }, info);
+}
+
+function deletePhoneNumber(parent, { id }, ctx, info) {
+    return ctx.db.mutation.deletePhoneNumber({ where: { id }, info});
+}
+
 function updateContact(parent, { id, firstName, lastName }, ctx, info) {
     return ctx.db.mutation.updateContact({
         where: {
@@ -45,25 +60,15 @@ function updateContact(parent, { id, firstName, lastName }, ctx, info) {
         data: {
             firstName,
             lastName
-        }}, info
-    )
-}
-
-async function deletePhoneNumber(parent, { id }, ctx, info) {
-  const phoneNumber = await ctx.db.mutation.deletePhoneNumber({ data: { id }, info});
-
-  return phoneNumber;
-}
-
-async function updatePhoneNumber(parent, { id, phoneNumber, label }, ctx, info) {
-  const phoneNumber = await ctx.db.mutation.updatePhoneNumber({ data: { id, phoneNumber, label } }, info);
-
-  return phoneNumber;
+        }
+    }, info)
 }
 
 module.exports = {
     post, 
     removeContact,
     addPhoneNumber,
-    removePhoneNumbers
+    removePhoneNumbers,
+    updatePhoneNumber,
+    deletePhoneNumber
 }
