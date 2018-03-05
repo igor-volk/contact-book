@@ -31,4 +31,4 @@ export const FEED_QUERY = gql`
   }
 `
 
-export default graphql(FEED_QUERY, { name: 'feedQuery' }) (ContactList)
+export default graphql(FEED_QUERY, { name: 'feedQuery'}) (ContactList)

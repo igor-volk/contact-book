@@ -39,7 +39,7 @@ class Contact extends Component {
 
     deleteContact = async () => {
         const contactId = this.props.contact.id
-        await this.props.deleteMutation({
+        await this.props.deleteContactMutation({
             variables: {
                 contactId
             },
@@ -52,7 +52,12 @@ class Contact extends Component {
                     data
                 })
             }
-        })
+        });
+        await this.props.deletePhoneNumbersMutation({
+            variables: {
+                contactId
+            }
+        });
     }
 
     editContact() {
@@ -84,7 +89,7 @@ class Contact extends Component {
     }
 }
 
-const DELETE_MUTATION = gql`
+const DELETE_CONTACT_MUTATION = gql`
   mutation DeleteMutation($contactId: ID!) {
     removeContact(id: $contactId) {
       id
@@ -94,7 +99,19 @@ const DELETE_MUTATION = gql`
   }
 `
 
+const DELETE_PHONE_NUMBERS_MUTATION = gql`
+  mutation DeleteMutation($contactId: ID!) {
+    removePhoneNumbers(contactId: $contactId) {
+      count
+    }
+  }
+`
+
+const deleteContactMutation = graphql(DELETE_CONTACT_MUTATION, { name: "deleteContactMutation" });
+const deletePhoneNumbersMutation = graphql(DELETE_PHONE_NUMBERS_MUTATION, { name: "deletePhoneNumbersMutation" });
+
 export default flow(
     withRouter,
-    graphql(DELETE_MUTATION, { name: "deleteMutation" }))
-(Contact);
+    deleteContactMutation,
+    deletePhoneNumbersMutation
+)(Contact);

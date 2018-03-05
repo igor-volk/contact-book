@@ -1,12 +1,15 @@
-# import PhoneNumber, Contact, PhoneNumberCreateInput from "./generated/prisma.graphql"
+# import PhoneNumber, Contact, BatchPayload from "./generated/prisma.graphql"
 
 type Query {
   feed(filter: String, skip: Int, first: Int): [Contact!]!
   contact(id: ID!): Contact
+  phoneNumbers(contactId: ID!) : [PhoneNumber!]
 }
 
 type Mutation {
-  post(firstName: String!, lastName: String!, phoneNumbers: [PhoneNumberCreateInput!]): Contact!
+  post(firstName: String!, lastName: String!): Contact!
   removeContact(id: ID!): Contact
-  updateContact(id: ID!, firstName: String, lastName: String, phoneNumbers: [PhoneNumberCreateInput!]) : Contact
+  updateContact(id: ID!, firstName: String, lastName: String) : Contact
+  addPhoneNumber(phoneNumber: String!, label: String!, contactId: ID!) : PhoneNumber!
+  removePhoneNumbers(contactId: ID!) : BatchPayload
 }

@@ -15,7 +15,16 @@ function contact(parent, { id }, ctx, info) {
     )
 }
 
+function phoneNumbers(parent, { contactId }, ctx, info) {
+    return ctx.db.query.phoneNumbers({
+        where: {
+            contactId
+        }}, info
+    )
+}
+
 module.exports = {
     feed,
-    contact
+    contact,
+    phoneNumbers
 }

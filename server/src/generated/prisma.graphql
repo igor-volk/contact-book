@@ -9,14 +9,13 @@ type Contact implements Node {
   id: ID!
   firstName: String!
   lastName: String!
-  phoneNumbers(where: PhoneNumberWhereInput, orderBy: PhoneNumberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [PhoneNumber!]
 }
 
 type PhoneNumber implements Node {
   id: ID!
   phoneNumber: String!
   label: String!
-  contact(where: ContactWhereInput): Contact
+  contactId: String!
 }
 
 
@@ -43,17 +42,6 @@ type ContactConnection {
 }
 
 input ContactCreateInput {
-  firstName: String!
-  lastName: String!
-  phoneNumbers: PhoneNumberCreateManyWithoutContactInput
-}
-
-input ContactCreateOneWithoutPhoneNumbersInput {
-  create: ContactCreateWithoutPhoneNumbersInput
-  connect: ContactWhereUniqueInput
-}
-
-input ContactCreateWithoutPhoneNumbersInput {
   firstName: String!
   lastName: String!
 }
@@ -102,32 +90,6 @@ input ContactSubscriptionWhereInput {
 input ContactUpdateInput {
   firstName: String
   lastName: String
-  phoneNumbers: PhoneNumberUpdateManyWithoutContactInput
-}
-
-input ContactUpdateOneWithoutPhoneNumbersInput {
-  create: ContactCreateWithoutPhoneNumbersInput
-  connect: ContactWhereUniqueInput
-  disconnect: ContactWhereUniqueInput
-  delete: ContactWhereUniqueInput
-  update: ContactUpdateWithoutPhoneNumbersInput
-  upsert: ContactUpsertWithoutPhoneNumbersInput
-}
-
-input ContactUpdateWithoutPhoneNumbersDataInput {
-  firstName: String
-  lastName: String
-}
-
-input ContactUpdateWithoutPhoneNumbersInput {
-  where: ContactWhereUniqueInput!
-  data: ContactUpdateWithoutPhoneNumbersDataInput!
-}
-
-input ContactUpsertWithoutPhoneNumbersInput {
-  where: ContactWhereUniqueInput!
-  update: ContactUpdateWithoutPhoneNumbersDataInput!
-  create: ContactCreateWithoutPhoneNumbersInput!
 }
 
 input ContactWhereInput {
@@ -175,9 +137,6 @@ input ContactWhereInput {
   lastName_not_starts_with: String
   lastName_ends_with: String
   lastName_not_ends_with: String
-  phoneNumbers_every: PhoneNumberWhereInput
-  phoneNumbers_some: PhoneNumberWhereInput
-  phoneNumbers_none: PhoneNumberWhereInput
 }
 
 input ContactWhereUniqueInput {
@@ -227,17 +186,7 @@ type PhoneNumberConnection {
 input PhoneNumberCreateInput {
   phoneNumber: String!
   label: String!
-  contact: ContactCreateOneWithoutPhoneNumbersInput
-}
-
-input PhoneNumberCreateManyWithoutContactInput {
-  create: [PhoneNumberCreateWithoutContactInput!]
-  connect: [PhoneNumberWhereUniqueInput!]
-}
-
-input PhoneNumberCreateWithoutContactInput {
-  phoneNumber: String!
-  label: String!
+  contactId: String!
 }
 
 type PhoneNumberEdge {
@@ -252,6 +201,8 @@ enum PhoneNumberOrderByInput {
   phoneNumber_DESC
   label_ASC
   label_DESC
+  contactId_ASC
+  contactId_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -262,6 +213,7 @@ type PhoneNumberPreviousValues {
   id: ID!
   phoneNumber: String!
   label: String!
+  contactId: String!
 }
 
 type PhoneNumberSubscriptionPayload {
@@ -284,32 +236,7 @@ input PhoneNumberSubscriptionWhereInput {
 input PhoneNumberUpdateInput {
   phoneNumber: String
   label: String
-  contact: ContactUpdateOneWithoutPhoneNumbersInput
-}
-
-input PhoneNumberUpdateManyWithoutContactInput {
-  create: [PhoneNumberCreateWithoutContactInput!]
-  connect: [PhoneNumberWhereUniqueInput!]
-  disconnect: [PhoneNumberWhereUniqueInput!]
-  delete: [PhoneNumberWhereUniqueInput!]
-  update: [PhoneNumberUpdateWithoutContactInput!]
-  upsert: [PhoneNumberUpsertWithoutContactInput!]
-}
-
-input PhoneNumberUpdateWithoutContactDataInput {
-  phoneNumber: String
-  label: String
-}
-
-input PhoneNumberUpdateWithoutContactInput {
-  where: PhoneNumberWhereUniqueInput!
-  data: PhoneNumberUpdateWithoutContactDataInput!
-}
-
-input PhoneNumberUpsertWithoutContactInput {
-  where: PhoneNumberWhereUniqueInput!
-  update: PhoneNumberUpdateWithoutContactDataInput!
-  create: PhoneNumberCreateWithoutContactInput!
+  contactId: String
 }
 
 input PhoneNumberWhereInput {
@@ -357,7 +284,20 @@ input PhoneNumberWhereInput {
   label_not_starts_with: String
   label_ends_with: String
   label_not_ends_with: String
-  contact: ContactWhereInput
+  contactId: String
+  contactId_not: String
+  contactId_in: [String!]
+  contactId_not_in: [String!]
+  contactId_lt: String
+  contactId_lte: String
+  contactId_gt: String
+  contactId_gte: String
+  contactId_contains: String
+  contactId_not_contains: String
+  contactId_starts_with: String
+  contactId_not_starts_with: String
+  contactId_ends_with: String
+  contactId_not_ends_with: String
 }
 
 input PhoneNumberWhereUniqueInput {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import flow from 'lodash.flow'
 
 import PhoneNumber from './PhoneNumber'
 
@@ -12,7 +13,6 @@ class EditContact extends Component {
 			lastName: '',
 			phoneNumbers: []
 		}
-		this.getContact = this.getContact.bind(this);
 		this.addPhoneNumber = this.addPhoneNumber.bind(this);
 		this.saveContact = this.saveContact.bind(this);
 		this.onNumberChange = this.onNumberChange.bind(this);
@@ -24,25 +24,23 @@ class EditContact extends Component {
 
 	componentWillReceiveProps(nextProps) {
 		console.log('--->', nextProps)
+
+		if (nextProps.contactQuery.loading || nextProps.phoneNumbersQuery.loading) return;
+
 		this.setState({
 			firstName: nextProps.contactQuery.contact.firstName,
-			lastName: nextProps.contactQuery.contact.lastName
+			lastName: nextProps.contactQuery.contact.lastName,
+			phoneNumbers: (nextProps.phoneNumbersQuery.phoneNumbers) ? nextProps.phoneNumbersQuery.phoneNumbers : []
 		});
 	}
 
 	addPhoneNumber() {
-		const phoneNumbers = this.state.phoneNumbers;
-		phoneNumbers.push({
-			phoneNumber: '',
-			label: ''
-		});
 		this.setState({
-			phoneNumbers: phoneNumbers
+			phoneNumbers: [...this.state.phoneNumbers, {
+				phoneNumber: '',
+				label: ''
+			}]
 		});
-	}
-
-	saveContact () {
-
 	}
 
 	onNumberChange (value, index) {
@@ -69,11 +67,13 @@ class EditContact extends Component {
 		});
 	}
 
-	getContact = async () => {
+	saveContact = async () => {
 		const contactId = this.props.match.params.id
-		await this.props.contactQuery({
+		await this.props.updateContactMutation({
 			variables: {
-				contactId
+				contactId,
+				firstName: this.state.firstName,
+				lastName: this.state.lastName
 			}
 		});
 	}
@@ -126,6 +126,7 @@ class EditContact extends Component {
 const CONTACT_QUERY = gql`
   query ContactQuery($contactId: ID!) {
     contact(id: $contactId) {
+      id
       firstName
       lastName
     }
@@ -133,32 +134,58 @@ const CONTACT_QUERY = gql`
 `
 
 const UPDATE_CONTACT_MUTATION = gql`
-  query UpdateContactMutation($contactId: ID!, $firstName: String, $lastName: String, $phoneNumbers: [String!]) {
-    updateContact(id: $contactId, firstName: $firstName, lastName: $lastName, phoneNumbers: $phoneNumbers) {
+  mutation UpdateContactMutation($contactId: ID!, $firstName: String, $lastName: String) {
+    updateContact(id: $contactId, firstName: $firstName, lastName: $lastName) {
       id
       firstName
       lastName
-      phoneNumbers
     }
   }
 `
 
-export default graphql(CONTACT_QUERY, {
+export const PHONE_NUMBERS_QUERY = gql`
+  query PhoneNumbersQuery($contactId: ID!) {
+    phoneNumbers(contactId: $contactId) {
+      id
+      phoneNumber
+      label
+      contactId
+    }
+  }
+`
+
+const contactQuery = graphql(CONTACT_QUERY, {
 	name: 'contactQuery',
+	options: ownProps => {
+		const contactId = ownProps.match.params.id;
+		return {
+			variables: {contactId}
+		}
+	}
+});
+
+const phoneNumbersQuery = graphql(PHONE_NUMBERS_QUERY, {
+	name: 'phoneNumbersQuery',
+	options: ownProps => {
+		const contactId = ownProps.match.params.id;
+		return {
+			variables: {contactId}
+		}
+	}
+});
+
+const updateContactMutation = graphql(UPDATE_CONTACT_MUTATION, {
+	name: 'updateContactMutation',
 	options: ownProps => {
 		const contactId = ownProps.match.params.id;
 		return {
 			variables: { contactId }
 		}
 	}
-}) (graphql(UPDATE_CONTACT_MUTATION, {
-	name: 'updateContactMutation',
-    options: ownProps => {
-        const contactId = ownProps.match.params.id;
-        return {
-            variables: {
-            	contactId
-            }
-        }
-    }
-})(EditContact))
+});
+
+export default flow(
+	contactQuery,
+	phoneNumbersQuery,
+	updateContactMutation
+)(EditContact);

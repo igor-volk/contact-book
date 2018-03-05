@@ -1,36 +1,99 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import flow from 'lodash.flow'
+
 import { FEED_QUERY } from './ContactList'
+import PhoneNumber from './PhoneNumber'
 
 class CreateContact extends Component {
-    state = {
-        firstName: '',
-        lastName: ''
+    constructor (props) {
+        super(props);
+
+        this.state = {
+            firstName: '',
+            lastName: '',
+            phoneNumbers: []
+        }
+
+        this.addPhoneNumber = this.addPhoneNumber.bind(this);
+        this.createContact = this.createContact.bind(this);
+        this.onNumberChange = this.onNumberChange.bind(this);
+        this.onLabelChange = this.onLabelChange.bind(this);
+        this.onPhoneNumberDelete = this.onPhoneNumberDelete.bind(this);
+        this.renderPhoneNumber = this.renderPhoneNumber.bind(this);
+    }
+
+    addPhoneNumber() {
+        this.setState({
+            phoneNumbers: [...this.state.phoneNumbers, {
+                phoneNumber: '',
+                label: ''
+            }]
+        });
+    }
+
+    onNumberChange (value, index) {
+        const phoneNumbers = this.state.phoneNumbers;
+        phoneNumbers[index].phoneNumber = value;
+        this.setState({
+            phoneNumbers: phoneNumbers
+        });
+    }
+
+    onLabelChange (value, index) {
+        const phoneNumbers = this.state.phoneNumbers;
+        phoneNumbers[index].label = value;
+        this.setState({
+            phoneNumbers: phoneNumbers
+        });
+    }
+
+    onPhoneNumberDelete (index) {
+        const phoneNumbers = this.state.phoneNumbers;
+        phoneNumbers.splice(index, 1);
+        this.setState({
+            phoneNumbers: phoneNumbers
+        });
+    }
+
+    renderPhoneNumber (phoneNumber, i) {
+        return (
+            <PhoneNumber
+                key={i}
+                index= {i}
+                data={phoneNumber}
+                onNumberChange={this.onNumberChange}
+                onLabelChange={this.onLabelChange}
+                onDelete={this.onPhoneNumberDelete}
+            />
+        )
     }
 
     render() {
         return (
             <div>
-            <div className="flex flex-column mt3">
-            <input
-                className="mb2"
-                value={this.state.description}
-                onChange={e => this.setState({ firstName: e.target.value })}
-                type="text"
-                placeholder="Last name"
-            />
-            <input
-                className="mb2"
-                value={this.state.url}
-                onChange={e => this.setState({ lastName: e.target.value })}
-                type="text"
-                placeholder="First name"
-            />
+                <div className="flex flex-column mt3">
+                <input
+                    className="mb2"
+                    value={this.state.description}
+                    onChange={e => this.setState({ firstName: e.target.value })}
+                    type="text"
+                    placeholder="Last name"
+                />
+                <input
+                    className="mb2"
+                    value={this.state.url}
+                    onChange={e => this.setState({ lastName: e.target.value })}
+                    type="text"
+                    placeholder="First name"
+                />
+                </div>
+                <button onClick={() => this.addPhoneNumber()}>Add phone number</button>
+                <div>{this.state.phoneNumbers.map(this.renderPhoneNumber)}</div>
+                <button onClick={() => this.createContact()}>Save</button>
             </div>
-            <button onClick={() => this.createContact()}>Submit</button>
-        </div>
-    )
+        )
     }
 
     createContact = async () => {
@@ -48,7 +111,19 @@ class CreateContact extends Component {
                     data
                 })
             }
-        })
+        }).then(async ({ data: { post: { id } } }) => {
+            await Promise.all(this.state.phoneNumbers.map(async item => {
+                const { phoneNumber, label } = item;
+                const contactId = id
+                await this.props.addPhoneNumberMutation({
+                    variables: {
+                        phoneNumber,
+                        label,
+                        contactId
+                    }
+                })
+            }));
+        });
         this.props.history.push(`/`)
     }
 }
@@ -63,5 +138,21 @@ const POST_MUTATION = gql`
   }
 `
 
+const ADD_PHONE_NUMBER_MUTATION = gql`
+  mutation AddPhoneNumberMutation($phoneNumber: String!, $label: String!, $contactId: ID!) {
+    addPhoneNumber(phoneNumber: $phoneNumber, label: $label, contactId: $contactId) {
+      id,
+      phoneNumber,
+      label,
+      contactId
+    }
+  }
+`
 
-export default graphql(POST_MUTATION, { name: 'postMutation' })(CreateContact)
+const createContactMutation = graphql(POST_MUTATION, { name: 'postMutation' });
+const addPhoneNumberMutation = graphql(ADD_PHONE_NUMBER_MUTATION, { name: 'addPhoneNumberMutation' });
+
+export default flow(
+    createContactMutation,
+    addPhoneNumberMutation
+)(CreateContact)
