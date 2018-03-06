@@ -78,15 +78,17 @@ class EditContact extends Component {
 		});
 	}
 
-	saveContact = async () => {
+	saveContact = () => {
 		const contactId = this.props.match.params.id
-		await this.props.updateContactMutation({
-			variables: {
-				contactId,
-				firstName: this.state.firstName,
-				lastName: this.state.lastName
-			}
-		});
+		if (this.state.firstName !== this.props.contactQuery.contact.firstName || this.state.lastName !== this.props.contactQuery.contact.lastName) {
+            this.props.updateContactMutation({
+                variables: {
+                    contactId,
+                    firstName: this.state.firstName,
+                    lastName: this.state.lastName
+                }
+            });
+		}
 		this.state.phoneNumbers.map(localPhoneNumber => {
 			// if phone number has just been added
 			if (!localPhoneNumber.id) {
@@ -123,8 +125,7 @@ class EditContact extends Component {
                     });
 				}
 			}
-		})
-        this.props.history.push('/')
+		});
 	}
 	
 	renderPhoneNumber (phoneNumber, i) {
@@ -139,9 +140,12 @@ class EditContact extends Component {
 			/>
 		)
 	}
-	
+
 	render () {
-		if (this.props.contactQuery && this.props.contactQuery.loading) {
+		if (
+			(this.props.contactQuery && this.props.contactQuery.loading) ||
+			(this.props.phoneNumbersQuery && this.props.phoneNumbersQuery.loading)
+		) {
 			return <div>Loading</div>
 		}
 

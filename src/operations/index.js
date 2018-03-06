@@ -50,7 +50,7 @@ export const POST_MUTATION = gql`
       lastName
     }
   }
-`
+`;
 
 
 
@@ -62,7 +62,7 @@ export const DELETE_CONTACT_MUTATION = gql`
       lastName
     }
   }
-`
+`;
 
 export const ADD_PHONE_NUMBER_MUTATION = gql`
   mutation AddPhoneNumberMutation($phoneNumber: String!, $label: String!, $contactId: ID!) {
@@ -73,7 +73,7 @@ export const ADD_PHONE_NUMBER_MUTATION = gql`
       contactId
     }
   }
-`
+`;
 
 export const DELETE_PHONE_NUMBER_MUTATION = gql`
   mutation DeletePhoneNumberMutation($id: ID!) {
@@ -84,7 +84,7 @@ export const DELETE_PHONE_NUMBER_MUTATION = gql`
       contactId
     }
   }
-`
+`;
 
 export const DELETE_PHONE_NUMBERS_MUTATION = gql`
   mutation DeleteMutation($contactId: ID!) {
@@ -92,15 +92,15 @@ export const DELETE_PHONE_NUMBERS_MUTATION = gql`
       count
     }
   }
-`
+`;
 
 export const UPDATE_PHONE_NUMBER_MUTATION = gql`
-  mutation UpdatePhoneNumberMutation($id: ID!, $firstName: String, $lastName: String, $contactId: ID!) {
-    updatePhoneNumber(id: $id, firstName: $firstName, lastName: $lastName, contactId: $contactId) {
+  mutation UpdatePhoneNumberMutation($id: ID!, $phoneNumber: String, $label: String, $contactId: ID) {
+    updatePhoneNumber(id: $id, phoneNumber: $phoneNumber, label: $label, contactId: $contactId) {
       id
-      firstName
-      lastName
+      phoneNumber
+      label
       contactId
     }
   }
-`
+`;
