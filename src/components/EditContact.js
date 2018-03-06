@@ -1,11 +1,18 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import { withRouter } from 'react-router'
-import gql from 'graphql-tag'
 import flow from 'lodash.flow'
 import isEqual from 'lodash.isequal'
 
 import PhoneNumber from './PhoneNumber'
+import {
+	CONTACT_QUERY,
+	UPDATE_CONTACT_MUTATION,
+	PHONE_NUMBERS_QUERY,
+	ADD_PHONE_NUMBER_MUTATION,
+	UPDATE_PHONE_NUMBER_MUTATION,
+	DELETE_PHONE_NUMBER_MUTATION
+} from '../operations'
 
 class EditContact extends Component {
 	constructor (props) {
@@ -80,6 +87,19 @@ class EditContact extends Component {
 				lastName: this.state.lastName
 			}
 		});
+		this.state.phoneNumbers.map(localPhoneNumber => {
+			// if phone number has just been added
+			if (!localPhoneNumber.id) {
+				this.props.addPhoneNumberMutation({
+					variables: {
+						phoneNumber: localPhoneNumber.phoneNumber,
+						label: localPhoneNumber.label,
+						contactId
+					},
+					refetchQueries: [{ query: PHONE_NUMBERS_QUERY, variables: { contactId }}]
+				})
+			}
+		});
 		this.props.phoneNumbersQuery.phoneNumbers.map(storedPhoneNumber => {
 			// if phone number is not in state -> delete
 			const localPhoneNumber = this.state.phoneNumbers.find(localPhoneNumber => localPhoneNumber.id === storedPhoneNumber.id)
@@ -152,59 +172,6 @@ class EditContact extends Component {
 	}
 }
 
-const CONTACT_QUERY = gql`
-  query ContactQuery($contactId: ID!) {
-    contact(id: $contactId) {
-      id
-      firstName
-      lastName
-    }
-  }
-`
-
-const UPDATE_CONTACT_MUTATION = gql`
-  mutation UpdateContactMutation($contactId: ID!, $firstName: String, $lastName: String) {
-    updateContact(id: $contactId, firstName: $firstName, lastName: $lastName) {
-      id
-      firstName
-      lastName
-    }
-  }
-`
-
-const PHONE_NUMBERS_QUERY = gql`
-  query PhoneNumbersQuery($contactId: ID!) {
-    phoneNumbers(contactId: $contactId) {
-      id
-      phoneNumber
-      label
-      contactId
-    }
-  }
-`
-
-const UPDATE_PHONE_NUMBER_MUTATION = gql`
-  mutation UpdatePhoneNumberMutation($id: ID!, $firstName: String, $lastName: String, $contactId: ID!) {
-    updatePhoneNumber(id: $id, firstName: $firstName, lastName: $lastName, contactId: $contactId) {
-      id
-      firstName
-      lastName
-      contactId
-    }
-  }
-`
-
-const DELETE_PHONE_NUMBER_MUTATION = gql`
-  mutation DeletePhoneNumberMutation($id: ID!) {
-    deletePhoneNumber(id: $id) {
-      id
-      phoneNumber
-      label
-      contactId
-    }
-  }
-`
-
 const contactQuery = graphql(CONTACT_QUERY, {
 	name: 'contactQuery',
 	options: ownProps => {
@@ -235,6 +202,10 @@ const updateContactMutation = graphql(UPDATE_CONTACT_MUTATION, {
 	}
 });
 
+const addPhoneNumberMutation = graphql(ADD_PHONE_NUMBER_MUTATION, {
+	name: 'addPhoneNumberMutation'
+});
+
 const updatePhoneNumberMutation = graphql(UPDATE_PHONE_NUMBER_MUTATION, {
 	name: 'updatePhoneNumberMutation'
 });
@@ -249,5 +220,6 @@ export default flow(
 	phoneNumbersQuery,
 	updateContactMutation,
     updatePhoneNumberMutation,
-    deletePhoneNumberMutation
+    deletePhoneNumberMutation,
+	addPhoneNumberMutation
 )(EditContact);

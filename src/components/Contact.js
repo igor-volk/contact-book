@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router'
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import flow from 'lodash.flow'
 
-import { FEED_QUERY } from './ContactList'
+import { 
+    CONTACTS_QUERY,
+    DELETE_CONTACT_MUTATION,
+    DELETE_PHONE_NUMBERS_MUTATION
+} from '../operations'
 
 class Contact extends Component {
     constructor (props) {
@@ -44,11 +47,11 @@ class Contact extends Component {
                 contactId
             },
             update: (store, { data: { removeContact } }) => {
-                const data = store.readQuery({ query: FEED_QUERY })
+                const data = store.readQuery({ query: CONTACTS_QUERY })
                 const newContacts = data.feed.filter(e => e.id !== removeContact.id)
                 data.feed = newContacts
                 store.writeQuery({
-                    query: FEED_QUERY,
+                    query: CONTACTS_QUERY,
                     data
                 })
             }
@@ -88,24 +91,6 @@ class Contact extends Component {
         )
     }
 }
-
-const DELETE_CONTACT_MUTATION = gql`
-  mutation DeleteMutation($contactId: ID!) {
-    removeContact(id: $contactId) {
-      id
-      firstName
-      lastName
-    }
-  }
-`
-
-const DELETE_PHONE_NUMBERS_MUTATION = gql`
-  mutation DeleteMutation($contactId: ID!) {
-    removePhoneNumbers(contactId: $contactId) {
-      count
-    }
-  }
-`
 
 const deleteContactMutation = graphql(DELETE_CONTACT_MUTATION, { name: "deleteContactMutation" });
 const deletePhoneNumbersMutation = graphql(DELETE_PHONE_NUMBERS_MUTATION, { name: "deletePhoneNumbersMutation" });

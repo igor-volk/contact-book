@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import Contact from './Contact'
+import { CONTACTS_QUERY } from '../operations'
 
 class ContactList extends Component {
     render() {
@@ -21,14 +21,4 @@ class ContactList extends Component {
     }
 }
 
-export const FEED_QUERY = gql`
-  query FeedQuery {
-    feed {
-      id
-      firstName
-      lastName
-    }
-  }
-`
-
-export default graphql(FEED_QUERY, { name: 'feedQuery'}) (ContactList)
+export default graphql(CONTACTS_QUERY, { name: 'feedQuery'}) (ContactList)

@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
 import flow from 'lodash.flow'
 
-import { FEED_QUERY } from './ContactList'
+import { 
+    CONTACTS_QUERY, 
+    POST_MUTATION, 
+    ADD_PHONE_NUMBER_MUTATION 
+} from '../operations'
+
 import PhoneNumber from './PhoneNumber'
 
 class CreateContact extends Component {
@@ -104,10 +108,10 @@ class CreateContact extends Component {
                 lastName
             },
             update: (store, { data: { post } }) => {
-                const data = store.readQuery({ query: FEED_QUERY })
+                const data = store.readQuery({ query: CONTACTS_QUERY })
                 data.feed.push(post)
                 store.writeQuery({
-                    query: FEED_QUERY,
+                    query: CONTACTS_QUERY,
                     data
                 })
             }
@@ -127,27 +131,6 @@ class CreateContact extends Component {
         this.props.history.push(`/`)
     }
 }
-
-const POST_MUTATION = gql`
-  mutation PostMutation($firstName: String!, $lastName: String!) {
-    post(firstName: $firstName, lastName: $lastName) {
-      id,
-      firstName,
-      lastName
-    }
-  }
-`
-
-const ADD_PHONE_NUMBER_MUTATION = gql`
-  mutation AddPhoneNumberMutation($phoneNumber: String!, $label: String!, $contactId: ID!) {
-    addPhoneNumber(phoneNumber: $phoneNumber, label: $label, contactId: $contactId) {
-      id,
-      phoneNumber,
-      label,
-      contactId
-    }
-  }
-`
 
 const createContactMutation = graphql(POST_MUTATION, { name: 'postMutation' });
 const addPhoneNumberMutation = graphql(ADD_PHONE_NUMBER_MUTATION, { name: 'addPhoneNumberMutation' });
